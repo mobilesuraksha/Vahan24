@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Vahan Sahayata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #DC143C 0%, #1E3A8A 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.05);
+            }
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .info-box h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-box ul {
+            text-align: left;
+            margin-left: 20px;
+            font-size: 14px;
+        }
+
+        .info-box li {
+            margin: 8px 0;
+            opacity: 0.9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        button {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #DC143C;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .status-indicator {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #FF6B6B;
+            margin-right: 8px;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .offline-icon {
+                font-size: 60px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+        
+        <h1>Internet Connection Lost</h1>
+        
+        <p>
+            You are currently offline. Some features may not work until you reconnect to the internet.
+        </p>
+
+        <div class="info-box">
+            <h3>What you can still do:</h3>
+            <ul>
+                <li>✓ View your booking history (cached)</li>
+                <li>✓ Check saved profiles</li>
+                <li>✓ Read previously loaded pages</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h3>What won't work:</h3>
+            <ul>
+                <li>✗ New booking requests</li>
+                <li>✗ Real-time status updates</li>
+                <li>✗ Mechanic assignment</li>
+                <li>✗ Sending reviews</li>
+            </ul>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-primary" onclick="goHome()">
+                🏠 Go to Home
+            </button>
+            <button class="btn-secondary" onclick="location.reload()">
+                🔄 Try Again
+            </button>
+        </div>
+
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            Waiting for connection...
+        </div>
+
+        <p style="margin-top: 30px; font-size: 12px; opacity: 0.7;">
+            The app will resume normal operation once you're back online.
+        </p>
+    </div>
+
+    <script>
+        // Check connection periodically
+        let online = navigator.onLine;
+
+        window.addEventListener('online', () => {
+            console.log('Back online');
+            showMessage('Connection restored! Reloading...');
+            setTimeout(() => location.reload(), 2000);
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('Went offline');
+        });
+
+        function goHome() {
+            window.location.href = '/';
+        }
+
+        function showMessage(msg) {
+            const p = document.querySelector('p:first-of-type');
+            p.textContent = msg;
+            p.style.color = '#90EE90';
+        }
+
+        // Periodic connection check
+        setInterval(() => {
+            fetch('/', { method: 'HEAD', cache: 'no-cache' })
+                .then(() => {
+                    if (!online) {
+                        online = true;
+                        showMessage('Connection restored! Reloading...');
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                })
+                .catch(() => {
+                    online = false;
+                });
+        }, 3000);
+    </script>
+</body>
+</html>

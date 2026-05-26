@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="24x7 Vahan Sahayata - Emergency Vehicle Repair & Assistance Service">
+    <meta name="theme-color" content="#DC143C">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Vahan Sahayata">
+    
+    <title>24x7 Vahan Sahayata - Vehicle Assistance</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23DC143C' width='192' height='192'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='100' font-weight='bold' fill='white' font-family='Arial'>🚗</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23DC143C' width='192' height='192'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='100' font-weight='bold' fill='white' font-family='Arial'>🚗</text></svg>">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner hidden">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Auth Screen -->
+    <div id="authScreen" class="screen active">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="logo-large">🚗</div>
+                <h1>24x7 Vahan Sahayata</h1>
+                <p class="tagline">Bike, Car, Tractor ya Loading Vahan — kahin bhi kharab ho, mistri turant pahunchega.</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" data-role="user">मैं ग्राहक हूं</button>
+                <button class="auth-tab-btn" data-role="mechanic">मैं मिस्त्री हूं</button>
+            </div>
+
+            <div id="googleAuthDiv" class="google-auth-container">
+                <button id="googleSignInBtn" class="btn btn-primary btn-large">
+                    <span class="btn-icon">🔐</span>
+                    Google से Login करें
+                </button>
+            </div>
+
+            <div class="auth-divider">या</div>
+
+            <form id="emailAuthForm" class="auth-form">
+                <div class="form-group">
+                    <input type="email" id="authEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="authPassword" placeholder="Password (min 6 characters)" required>
+                </div>
+                <button type="submit" class="btn btn-secondary btn-large">
+                    <span class="btn-icon">✉️</span>
+                    Email से Login करें
+                </button>
+            </form>
+
+            <p class="auth-note">पहली बार? आप स्वचालित रूप से रजिस्टर हो जाएंगे</p>
+        </div>
+    </div>
+
+    <!-- User Profile Setup Screen -->
+    <div id="profileSetupScreen" class="screen">
+        <div class="screen-header">
+            <h2>प्रोफाइल सेटअप</h2>
+            <p>अपनी जानकारी दर्ज करें</p>
+        </div>
+
+        <form id="profileForm" class="form-container">
+            <div class="form-group">
+                <label for="profileName">नाम</label>
+                <input type="text" id="profileName" placeholder="आपका नाम" required>
+            </div>
+
+            <div class="form-group">
+                <label for="profilePhone">फोन नंबर</label>
+                <input type="tel" id="profilePhone" placeholder="10-digit phone number" required>
+            </div>
+
+            <div class="form-group">
+                <label for="profileAddress">पता</label>
+                <input type="text" id="profileAddress" placeholder="घर का पता" required>
+            </div>
+
+            <div class="form-group">
+                <label for="profileLandmark">लैंडमार्क</label>
+                <input type="text" id="profileLandmark" placeholder="पास की जगह">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large">सेव करें</button>
+        </form>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainScreen" class="screen">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <div class="nav-brand">
+                <span class="brand-icon">🚗</span>
+                <span class="brand-name">Vahan Sahayata</span>
+            </div>
+            <div class="nav-user">
+                <button id="userMenuBtn" class="btn-icon-only">👤</button>
+            </div>
+        </div>
+
+        <!-- User Menu Dropdown -->
+        <div id="userMenu" class="dropdown-menu hidden">
+            <div class="menu-header">
+                <p id="userDisplayName" class="user-name"></p>
+                <small id="userDisplayEmail" class="user-email"></small>
+            </div>
+            <div class="menu-divider"></div>
+            <button id="editProfileBtn" class="menu-item">✏️ प्रोफाइल संपादित करें</button>
+            <button id="viewHistoryBtn" class="menu-item">📋 अनुरोध इतिहास</button>
+            <button id="logoutBtn" class="menu-item danger">🚪 लॉगआउट</button>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="emergency">🆘 आपातकाल</button>
+            <button class="tab-btn" data-tab="status">📍 स्थिति</button>
+            <button class="tab-btn" data-tab="history">📜 इतिहास</button>
+        </div>
+
+        <!-- Emergency Booking Tab -->
+        <div id="emergencyTab" class="tab-content active">
+            <div class="form-container">
+                <h3 class="form-title">आपातकालीन बुकिंग</h3>
+
+                <form id="bookingForm" class="booking-form">
+                    <!-- Vehicle Type -->
+                    <div class="form-group">
+                        <label>वाहन का प्रकार *</label>
+                        <div class="vehicle-grid">
+                            <label class="vehicle-option">
+                                <input type="radio" name="vehicleType" value="Bike" required>
+                                <span class="vehicle-icon">🏍️</span>
+                                <span>Bike</span>
+                            </label>
+                            <label class="vehicle-option">
+                                <input type="radio" name="vehicleType" value="Car">
+                                <span class="vehicle-icon">🚗</span>
+                                <span>Car</span>
+                            </label>
+                            <label class="vehicle-option">
+                                <input type="radio" name="vehicleType" value="Tempo">
+                                <span class="vehicle-icon">🚚</span>
+                                <span>Tempo</span>
+                            </label>
+                            <label class="vehicle-option">
+                                <input type="radio" name="vehicleType" value="Loading Vehicle">
+                                <span class="vehicle-icon">🛻</span>
+                                <span>Loading</span>
+                            </label>
+                            <label class="vehicle-option">
+                                <input type="radio" name="vehicleType" value="Tractor">
+                                <span class="vehicle-icon">🚜</span>
+                                <span>Tractor</span>
+                            </label>
+                            <label class="vehicle-option">
+                                <input type="radio" name="vehicleType" value="Truck">
+                                <span class="vehicle-icon">🚛</span>
+                                <span>Truck</span>
+                            </label>
+                            <label class="vehicle-option">
+                                <input type="radio" name="vehicleType" value="Other">
+                                <span class="vehicle-icon">❓</span>
+                                <span>अन्य</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Problem Type -->
+                    <div class="form-group">
+                        <label>समस्या का प्रकार *</label>
+                        <div class="problem-grid">
+                            <label class="problem-option">
+                                <input type="radio" name="problemType" value="Puncture" required>
+                                <span class="problem-icon">🎈</span>
+                                <span>Puncture</span>
+                            </label>
+                            <label class="problem-option">
+                                <input type="radio" name="problemType" value="Engine">
+                                <span class="problem-icon">⚙️</span>
+                                <span>Engine</span>
+                            </label>
+                            <label class="problem-option">
+                                <input type="radio" name="problemType" value="Battery">
+                                <span class="problem-icon">🔋</span>
+                                <span>Battery</span>
+                            </label>
+                            <label class="problem-option">
+                                <input type="radio" name="problemType" value="Fuel">
+                                <span class="problem-icon">⛽</span>
+                                <span>Fuel</span>
+                            </label>
+                            <label class="problem-option">
+                                <input type="radio" name="problemType" value="Brake">
+                                <span class="problem-icon">🛑</span>
+                                <span>Brake</span>
+                            </label>
+                            <label class="problem-option">
+                                <input type="radio" name="problemType" value="Accident">
+                                <span class="problem-icon">💥</span>
+                                <span>Accident</span>
+                            </label>
+                            <label class="problem-option">
+                                <input type="radio" name="problemType" value="Towing">
+                                <span class="problem-icon">🔗</span>
+                                <span>Towing</span>
+                            </label>
+                            <label class="problem-option">
+                                <input type="radio" name="problemType" value="Other">
+                                <span class="problem-icon">📞</span>
+                                <span>अन्य</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="description">समस्या का विवरण</label>
+                        <textarea id="description" name="description" placeholder="समस्या के बारे में विस्तार से बताएं" rows="4"></textarea>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label>वर्तमान स्थान *</label>
+                        <button type="button" id="getLocationBtn" class="btn btn-outline">
+                            📍 वर्तमान स्थान प्राप्त करें
+                        </button>
+                        <div id="locationStatus" class="location-status"></div>
+                        <input type="hidden" id="locationLat" name="locationLat">
+                        <input type="hidden" id="locationLng" name="locationLng">
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-group">
+                        <label for="address">पता</label>
+                        <input type="text" id="address" name="address" placeholder="अपना पता दर्ज करें" required>
+                    </div>
+
+                    <!-- Vehicle Photo -->
+                    <div class="form-group">
+                        <label for="vehiclePhoto">वाहन की फोटो</label>
+                        <input type="file" id="vehiclePhoto" name="vehiclePhoto" accept="image/*" capture="environment">
+                        <small>वाहन की फोटो अपलोड करें (वैकल्पिक)</small>
+                        <div id="photoPreview" class="photo-preview"></div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="form-group">
+                        <label for="bookingPhone">फोन नंबर</label>
+                        <input type="tel" id="bookingPhone" name="bookingPhone" placeholder="आपका फोन नंबर" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-large btn-submit">
+                        <span class="btn-icon">🚨</span>
+                        अनुरोध भेजें
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Status Tab -->
+        <div id="statusTab" class="tab-content">
+            <div id="statusContent" class="status-container">
+                <p class="empty-state">कोई सक्रिय अनुरोध नहीं</p>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="historyTab" class="tab-content">
+            <div id="historyContent" class="history-container">
+                <p class="empty-state">कोई इतिहास नहीं</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="emergency">
+            <span class="nav-icon">🆘</span>
+            <span class="nav-label">आपातकाल</span>
+        </button>
+        <button class="nav-item" data-tab="status">
+            <span class="nav-icon">📍</span>
+            <span class="nav-label">स्थिति</span>
+        </button>
+        <button class="nav-item" data-tab="history">
+            <span class="nav-icon">📜</span>
+            <span class="nav-label">इतिहास</span>
+        </button>
+    </nav>
+
+    <!-- Install PWA Banner -->
+    <div id="installPrompt" class="install-banner hidden">
+        <div class="install-content">
+            <span class="install-icon">📱</span>
+            <div class="install-text">
+                <p><strong>App इंस्टॉल करें</strong></p>
+                <small>होम स्क्रीन पर त्वरित पहुंच</small>
+            </div>
+            <button id="installBtn" class="btn btn-small">इंस्टॉल</button>
+            <button id="dismissInstallBtn" class="btn-close">✕</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script src="firebase.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

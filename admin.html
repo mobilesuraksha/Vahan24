@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin Dashboard - 24x7 Vahan Sahayata">
+    <meta name="theme-color" content="#1E3A8A">
+    
+    <title>Admin Dashboard - Vahan Sahayata</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+            gap: 0;
+        }
+
+        .admin-sidebar {
+            background: linear-gradient(180deg, var(--primary-blue) 0%, #0F2847 100%);
+            color: white;
+            padding: var(--spacing-xl);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            width: 250px;
+            z-index: 100;
+        }
+
+        .admin-main {
+            margin-left: 250px;
+            padding: var(--spacing-xl);
+        }
+
+        .admin-brand {
+            margin-bottom: var(--spacing-2xl);
+            font-size: var(--font-2xl);
+            font-weight: 700;
+        }
+
+        .admin-menu {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .admin-menu-item {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: all var(--transition-base);
+            font-size: var(--font-sm);
+            font-weight: 600;
+        }
+
+        .admin-menu-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .admin-menu-item.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-left: 4px solid white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border-top: 4px solid var(--primary-red);
+        }
+
+        .stat-card.users {
+            border-top-color: var(--primary-blue);
+        }
+
+        .stat-card.mechanics {
+            border-top-color: var(--primary-green);
+        }
+
+        .stat-number {
+            font-size: var(--font-4xl);
+            font-weight: 700;
+            color: var(--primary-red);
+            margin: var(--spacing-md) 0;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: var(--font-sm);
+        }
+
+        .admin-table {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .admin-table-header {
+            padding: var(--spacing-lg);
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-table-body {
+            overflow-x: auto;
+        }
+
+        .admin-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th {
+            padding: var(--spacing-lg);
+            text-align: left;
+            font-weight: 700;
+            background: var(--bg-light);
+            border-bottom: 2px solid var(--border-dark);
+            font-size: var(--font-sm);
+        }
+
+        .admin-table td {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-light);
+            font-size: var(--font-sm);
+        }
+
+        .admin-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            margin-right: var(--spacing-sm);
+            font-size: var(--font-xs);
+            border-radius: var(--radius-sm);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: var(--font-xs);
+            font-weight: 700;
+        }
+
+        .badge.approved {
+            background: rgba(22, 163, 74, 0.2);
+            color: var(--primary-green);
+        }
+
+        .badge.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--status-pending);
+        }
+
+        @media (max-width: 768px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-sidebar {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                height: auto;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .admin-main {
+                margin-left: 0;
+                padding-bottom: 60px;
+            }
+
+            .admin-menu {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading -->
+    <div id="loadingSpinner" class="loading-spinner hidden">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Auth Screen -->
+    <div id="authScreen" class="screen active">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="logo-large">👨‍💼</div>
+                <h1>Admin Dashboard</h1>
+                <p class="tagline">24x7 Vahan Sahayata Management</p>
+            </div>
+
+            <form id="adminAuthForm" class="auth-form">
+                <div class="form-group">
+                    <input type="email" id="adminEmail" placeholder="Admin Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="adminPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-large">
+                    Admin Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainScreen" class="screen">
+        <div class="admin-container">
+            <div class="admin-layout">
+                <!-- Sidebar -->
+                <div class="admin-sidebar">
+                    <div class="admin-brand">
+                        👨‍💼 Admin
+                    </div>
+                    <div class="admin-menu">
+                        <button class="admin-menu-item active" data-section="dashboard">📊 Dashboard</button>
+                        <button class="admin-menu-item" data-section="users">👥 Users</button>
+                        <button class="admin-menu-item" data-section="mechanics">🔧 Mechanics</button>
+                        <button class="admin-menu-item" data-section="requests">📋 Requests</button>
+                        <button class="admin-menu-item" data-section="reviews">⭐ Reviews</button>
+                        <button class="admin-menu-item danger" onclick="logoutAdmin()">🚪 Logout</button>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="admin-main">
+                    <!-- Dashboard Section -->
+                    <div id="dashboardSection" class="section active">
+                        <h2 style="margin-bottom: 30px; font-size: var(--font-3xl);">Dashboard</h2>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card users">
+                                <div class="stat-label">👥 Total Users</div>
+                                <div class="stat-number" id="totalUsers">0</div>
+                            </div>
+                            <div class="stat-card mechanics">
+                                <div class="stat-label">🔧 Total Mechanics</div>
+                                <div class="stat-number" id="totalMechanics">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">🔔 Pending Requests</div>
+                                <div class="stat-number" id="pendingRequests">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">✓ Completed Jobs</div>
+                                <div class="stat-number" id="completedJobs">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Section -->
+                    <div id="usersSection" class="section">
+                        <h2 style="margin-bottom: 20px;">Users</h2>
+                        <div class="admin-table">
+                            <div class="admin-table-body">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Joined</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usersTableBody">
+                                        <tr><td colspan="4" class="empty-state">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mechanics Section -->
+                    <div id="mechanicsSection" class="section">
+                        <h2 style="margin-bottom: 20px;">Mechanics</h2>
+                        <div class="admin-table">
+                            <div class="admin-table-body">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Phone</th>
+                                            <th>Experience</th>
+                                            <th>Rating</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mechanicsTableBody">
+                                        <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Requests Section -->
+                    <div id="requestsSection" class="section">
+                        <h2 style="margin-bottom: 20px;">Requests</h2>
+                        <div class="admin-table">
+                            <div class="admin-table-body">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Vehicle</th>
+                                            <th>Problem</th>
+                                            <th>Customer</th>
+                                            <th>Mechanic</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="requestsTableBody">
+                                        <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Section -->
+                    <div id="reviewsSection" class="section">
+                        <h2 style="margin-bottom: 20px;">Reviews</h2>
+                        <div id="reviewsContainer" class="form-container">
+                            <p class="empty-state">Loading reviews...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js"></script>
+    
+    <script src="firebase.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

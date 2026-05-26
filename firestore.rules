@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Allow read/write for all authenticated users on their own documents
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+      allow list: if request.auth != null;
+    }
+
+    // Mechanics collection - manage own profile
+    match /mechanics/{mechanicId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == mechanicId;
+      allow list: if request.auth != null;
+    }
+
+    // Requests collection
+    match /requests/{requestId} {
+      // User can read own requests
+      allow read: if request.auth.uid == resource.data.userId;
+      
+      // Mechanic can read assigned requests
+      allow read: if request.auth.uid == resource.data.assignedMechanicId;
+      
+      // Users can create new requests
+      allow create: if request.auth != null && 
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.status == 'Pending';
+      
+      // Users can update their own pending requests (cancel)
+      allow update: if request.auth.uid == resource.data.userId &&
+                       (resource.data.status == 'Pending' || resource.data.status == 'Accepted');
+      
+      // Mechanics can update assigned requests
+      allow update: if request.auth.uid == resource.data.assignedMechanicId;
+      
+      // Admin operations (handled separately)
+      allow read, write: if isAdmin();
+    }
+
+    // Reviews collection
+    match /reviews/{reviewId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth.uid == request.resource.data.userId;
+      allow update: if request.auth.uid == resource.data.userId;
+      allow delete: if request.auth.uid == resource.data.userId || isAdmin();
+    }
+
+    // Admin collection for sensitive data
+    match /admin/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Helper function - check if user is admin
+    function isAdmin() {
+      return request.auth.token.email in ['admin@gmail.com', 'youradmin@email.com'];
+    }
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mechanic Dashboard - 24x7 Vahan Sahayata">
+    <meta name="theme-color" content="#DC143C">
+    
+    <title>Mechanic Dashboard - Vahan Sahayata</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner hidden">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Auth Screen -->
+    <div id="authScreen" class="screen active">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="logo-large">🔧</div>
+                <h1>24x7 Vahan Sahayata</h1>
+                <p class="tagline">Mechanics Portal</p>
+            </div>
+
+            <div id="googleAuthDiv" class="google-auth-container">
+                <button id="googleSignInBtn" class="btn btn-primary btn-large">
+                    <span class="btn-icon">🔐</span>
+                    Google से Login करें
+                </button>
+            </div>
+
+            <div class="auth-divider">या</div>
+
+            <form id="emailAuthForm" class="auth-form">
+                <div class="form-group">
+                    <input type="email" id="authEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="authPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-secondary btn-large">
+                    Login करें
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile Setup -->
+    <div id="profileSetupScreen" class="screen">
+        <div class="screen-header">
+            <h2>मिस्त्री प्रोफाइल</h2>
+        </div>
+
+        <form id="mechanicProfileForm" class="form-container">
+            <div class="form-group">
+                <label for="mechanicName">नाम</label>
+                <input type="text" id="mechanicName" placeholder="अपना नाम" required>
+            </div>
+
+            <div class="form-group">
+                <label for="mechanicPhone">फोन नंबर</label>
+                <input type="tel" id="mechanicPhone" placeholder="10-digit number" required>
+            </div>
+
+            <div class="form-group">
+                <label for="experience">अनुभव (वर्षों में)</label>
+                <input type="number" id="experience" placeholder="0" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>विशेषज्ञता</label>
+                <div style="display: grid; gap: 10px; margin-top: 10px;">
+                    <label><input type="checkbox" name="vehicleTypes" value="Bike"> Bike</label>
+                    <label><input type="checkbox" name="vehicleTypes" value="Car"> Car</label>
+                    <label><input type="checkbox" name="vehicleTypes" value="Tempo"> Tempo</label>
+                    <label><input type="checkbox" name="vehicleTypes" value="Truck"> Truck</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="serviceArea">सेवा क्षेत्र (km)</label>
+                <input type="number" id="serviceArea" placeholder="10" min="1" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-large">सेव करें</button>
+        </form>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="mainScreen" class="screen">
+        <!-- Top Nav -->
+        <div class="top-nav">
+            <div class="nav-brand">
+                <span class="brand-icon">🔧</span>
+                <span class="brand-name">मिस्त्री डैशबोर्ड</span>
+            </div>
+            <div class="nav-user">
+                <button id="userMenuBtn" class="btn-icon-only">👤</button>
+            </div>
+        </div>
+
+        <!-- User Menu -->
+        <div id="userMenu" class="dropdown-menu hidden">
+            <div class="menu-header">
+                <p id="userDisplayName" class="user-name"></p>
+                <small id="userDisplayEmail" class="user-email"></small>
+            </div>
+            <div class="menu-divider"></div>
+            <button id="toggleOnlineBtn" class="menu-item">🟢 Online/Offline</button>
+            <button id="viewJobsBtn" class="menu-item">📋 मेरी नौकरियां</button>
+            <button id="logoutBtn" class="menu-item danger">🚪 लॉगआउट</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="requests">🔔 अनुरोध</button>
+            <button class="tab-btn" data-tab="active">⚙️ सक्रिय</button>
+            <button class="tab-btn" data-tab="completed">✓ पूर्ण</button>
+        </div>
+
+        <!-- Requests Tab -->
+        <div id="requestsTab" class="tab-content active">
+            <div class="form-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 class="form-title">पास के अनुरोध</h3>
+                    <div id="onlineStatus" style="display: flex; align-items: center; gap: 10px;">
+                        <span id="statusIndicator" style="width: 12px; height: 12px; border-radius: 50%; background: #ccc;"></span>
+                        <span id="statusText">Offline</span>
+                    </div>
+                </div>
+            </div>
+            <div id="requestsContent" class="form-container">
+                <p class="empty-state">अनुरोध लोड हो रहे हैं...</p>
+            </div>
+        </div>
+
+        <!-- Active Jobs Tab -->
+        <div id="activeTab" class="tab-content">
+            <div id="activeContent" class="form-container">
+                <p class="empty-state">कोई सक्रिय नौकरी नहीं</p>
+            </div>
+        </div>
+
+        <!-- Completed Tab -->
+        <div id="completedTab" class="tab-content">
+            <div id="completedContent" class="form-container">
+                <p class="empty-state">कोई पूर्ण नौकरी नहीं</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="requests">
+            <span class="nav-icon">🔔</span>
+            <span class="nav-label">अनुरोध</span>
+        </button>
+        <button class="nav-item" data-tab="active">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">सक्रिय</span>
+        </button>
+        <button class="nav-item" data-tab="completed">
+            <span class="nav-icon">✓</span>
+            <span class="nav-label">पूर्ण</span>
+        </button>
+    </nav>
+
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script src="firebase.js"></script>
+    <script src="mechanic.js"></script>
+</body>
+</html>
